@@ -29,3 +29,8 @@ The standalone can be built in the following way:
  cmake .
  make
  ./client_controller
+
+--------------------------------------------------------------------------------------------------------------------------
+The solution is far from optimal, but might be enough for a first version. Prediction could improve much on the performance of the route planning.
+
+I have seen a few minor bugs, which are not trivial to reproduce. If you happen to meet with any of them please do not hesitate to inform me. :)
