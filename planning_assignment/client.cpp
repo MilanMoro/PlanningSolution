@@ -30,7 +30,7 @@ class Controller {
 
     private: int32_t simulation_round = 0;
 
-    public: EgoController Control = EgoController({20,1.999,1.999}, 0.1, 46, 58, 0.05);
+    public: EgoController Control = EgoController({20,1.999999,1.999}, 0.1, 46, 58, 0.05);
 
     public: void Init()
     {
