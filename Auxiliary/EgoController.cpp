@@ -50,7 +50,7 @@ void EgoController::PlanRoute()
 	if (isCarOnLane && (carOnLaneSpeed < Planner.state.v))
 	{
 		// If there is a car ahead with higher speed, decrease speed to avoid collison
-		actualTrajectory = Planner.CalculateTrajectoryToSpeed(carOnLaneSpeed);
+		actualTrajectory = Planner.CalculateTrajectoryToSpeed(0);
 	}
 	else if (isCarOnLane)
 	{
