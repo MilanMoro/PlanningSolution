@@ -224,6 +224,15 @@ TEST(OptimizationTests, CrossBehindSuccessTest)
 	EXPECT_LE(result1.cost,result2.cost);
 }
 
+TEST(OptimizationTests, CrossBehindBugTest)
+{
+	auto Planner = RoutePlanner({20,2,1.999},0.1,46,58);
+	Planner.state = {50-7.89165,0,0};
+	Planner.sGoal = 80;
+	Planner.AddConstraint({0,2.96095});
+	auto result1 = Planner.CalculateCrossBehindATrajectory(0,0,5.9565);
+}
+
 TEST(OptimizationTests, CrossBehindLowSpeedTest)
 {
 	auto Planner = RoutePlanner({20,2,1.999},0.1,35,40);
