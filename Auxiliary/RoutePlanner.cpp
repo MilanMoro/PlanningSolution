@@ -10,15 +10,9 @@
 #include <numeric>
 #include <valarray>
 #include <map>
-#include <iostream>
 
 std::vector<double> RoutePlanner::CalculateOptimalTrajectory()
 {
-
-	for(int i = 0; i < int(Constraints.size()); i++)
-	{
-		std::cout << "Constraints:  " << Constraints[i].first << ' '  << Constraints[i].second << std::endl;
-	}
 
 	std::map<double,std::vector<double>> trajectoryMap;
 	if((Constraints.size() == 0) || (state.s > crossingStart))
