@@ -10,14 +10,20 @@
 #include <numeric>
 #include <valarray>
 #include <map>
+#include <iostream>
 
 std::vector<double> RoutePlanner::CalculateOptimalTrajectory()
 {
 
-	std::map<double,std::vector<double>> trajectoryMap;
-	if(Constraints.size() == 0)
+	for(int i = 0; i < int(Constraints.size()); i++)
 	{
-		// If there are no constraints (no car on the right)
+		std::cout << "Constraints:  " << Constraints[i].first << ' '  << Constraints[i].second << std::endl;
+	}
+
+	std::map<double,std::vector<double>> trajectoryMap;
+	if((Constraints.size() == 0) || (state.s > crossingStart))
+	{
+		// If there are no constraints (no car on the right) or the ego car already left (or already in) the intersection
 		return FixSpeedLimitRoundingError(CalculateOptimalFreeRoadTrajectory().trajectory);
 	}
 
@@ -66,7 +72,8 @@ std::vector<double> RoutePlanner::CalculateTrajectoryToSpeed(double vEnd)
 TrajectoryWithCost RoutePlanner::CalculateOptimalFreeRoadTrajectory()
 {
 	std::vector<OptimizationArgumentOption> arg;
-	arg.push_back({state.v,limits.v_max,0.1,state.v,true});
+	// The Speed at the end of the run can not be lower than 1 m/s to avoid calculation really long trajectories
+	arg.push_back({std::max(state.v,1.0),limits.v_max,0.1,std::max(state.v,1.0),true});
 	OptimizationResult result =  OptimizeChemotaxis(this, 1000, arg, &RoutePlanner::CostCrossAhead, -1);
 	double vMaxOptimal = result.optimalArguments[0];
 
@@ -85,7 +92,7 @@ TrajectoryWithCost RoutePlanner::CalculateOptimalCrossingAheadFirstTrajectory()
 		return {vTrajectory, MAX_COST};
 	}
 	std::vector<OptimizationArgumentOption> arg;
-	arg.push_back({state.v,limits.v_max,0.1,limits.v_max,true});
+	arg.push_back({std::max(state.v,1.0),limits.v_max,0.1,limits.v_max,true});
 	OptimizationResult result =  OptimizeChemotaxis(this, 1000, arg, &RoutePlanner::CostCrossAhead, 0);
 	double vMaxOptimal = result.optimalArguments[0];
 
@@ -282,18 +289,20 @@ std::vector<double> RoutePlanner::CalculateCrossBehindATrajectory(double v1, dou
 		aTrajectory.push_back(0);
 	}
 
-	double v;
+	double v, a;
 	if (vTrajectory.empty())
 	{
 		v = state.v;
+		a = 0;
 	}
 	else
 	{
 		v = vTrajectory.back();
+		a = aTrajectory.back();
 	}
 
 	//Set v2
-	auto aTrajectoryTemp = CalculateATrajectory(v, v2 ,aTrajectory.back());
+	auto aTrajectoryTemp = CalculateATrajectory(v, v2 , a);
 	aTrajectory.insert( aTrajectory.end(), aTrajectoryTemp.begin(), aTrajectoryTemp.end() );
 	vTrajectory = DiscreteIntegrator(aTrajectory, state.v , ts);
 	sTrajectory = DiscreteIntegrator(vTrajectory, state.s, ts);
